@@ -1,33 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-
-// import 'bloc_main.dart';
-// import 'pages/todo_list_page.dart';
-
-// enum SortType { title, startTime, status }
-
-// void main() {
-//   runApp(BlocProvider(create: (_) => TodoCubit(), child: const MyApp()));
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<TodoCubit, TodoState>(
-//       builder: (context, state) {
-//         return MaterialApp(
-//           title: 'Todo App',
-//           theme: ThemeData.light(),
-//           darkTheme: ThemeData.dark(),
-//           themeMode: state.themeMode,
-//           home: const TodoListPage(), // 你的无状态 UI
-//         );
-//       },
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc_main.dart';
