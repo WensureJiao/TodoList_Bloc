@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'models/todo.dart';
-import 'dart:math';
 
 enum SortType { title, startTime, status }
 // ---------- TODO 状态和事件 ----------
@@ -9,13 +8,8 @@ enum SortType { title, startTime, status }
 class TodoState {
   final List<Todo> todos;
   final SortType sortType;
-  final ThemeMode themeMode;
 
-  TodoState({
-    required this.todos,
-    this.sortType = SortType.title,
-    this.themeMode = ThemeMode.light,
-  });
+  const TodoState({required this.todos, this.sortType = SortType.title});
   // 复制当前状态
   // 以便在更新时使用
   TodoState copyWith({
@@ -26,7 +20,6 @@ class TodoState {
     return TodoState(
       todos: todos ?? this.todos,
       sortType: sortType ?? this.sortType,
-      themeMode: themeMode ?? this.themeMode,
     );
   }
 }
@@ -36,25 +29,42 @@ class TodoCubit extends Cubit<TodoState> {
 
   // ---------- TODO 管理 ----------
   void addTodo(Todo todo) {
-    final updated = List<Todo>.from(state.todos)..add(todo);
-    //List<Todo>.from(state.todos) 是为了创建一个新的列表
-    // ..add(todo) 是为了添加新的 todo
+    final updated = List<Todo>.unmodifiable([...state.todos, todo]);
+    // List<Todo>.unmodifiable([...state.todos, todo]) 是为了创建一个不可
+    // 修改的列表
+    // 这样可以确保状态的不可变性，符合 Bloc 的设计原则
     emit(state.copyWith(todos: updated));
   }
 
   void updateTodoById(String id, Todo newTodo) {
-    final updated = state.todos.map((t) => t.id == id ? newTodo : t).toList();
-    emit(state.copyWith(todos: updated));
+    bool found = false;
+    final updated = List<Todo>.unmodifiable(
+      state.todos.map((t) {
+        if (t.id == id) {
+          found = true;
+          return newTodo;
+        }
+        return t;
+      }),
+    );
+
+    if (found) {
+      emit(state.copyWith(todos: updated));
+    }
   }
 
   void deleteTodoById(String id) {
     final updated = state.todos.where((t) => t.id != id).toList();
-    emit(state.copyWith(todos: updated));
+
+    // 如果长度没变，说明没有匹配的 todo
+    if (updated.length != state.todos.length) {
+      emit(state.copyWith(todos: List.unmodifiable(updated)));
+    }
   }
 
   /// 新增：修改排序方式
   void changeSort(SortType sortType) {
-    final sorted = List<Todo>.from(state.todos);
+    final sorted = [...state.todos];
 
     switch (sortType) {
       case SortType.title:
@@ -75,28 +85,9 @@ class TodoCubit extends Cubit<TodoState> {
     emit(state.copyWith(todos: []));
   }
 
-  void addRandomTodos(int count) {
-    final random = Random();
-    final newTodos = List.generate(count, (i) {
-      final status =
-          TodoStatus.values[random.nextInt(TodoStatus.values.length)];
-      return Todo(
-        id: DateTime.now().toIso8601String() + random.nextInt(1000).toString(),
-        title: 'Random Todo ${random.nextInt(1000)}',
-        status: status,
-      );
-    });
-    emit(state.copyWith(todos: List<Todo>.from(state.todos)..addAll(newTodos)));
-  }
-
-  // ---------- 主题 ----------
-  void toggleTheme() {
-    emit(
-      state.copyWith(
-        themeMode: state.themeMode == ThemeMode.light
-            ? ThemeMode.dark
-            : ThemeMode.light,
-      ),
-    );
+  // ---------- 批量添加 ----------
+  void addTodos(List<Todo> newTodos) {
+    final updated = List<Todo>.unmodifiable([...state.todos, ...newTodos]);
+    emit(state.copyWith(todos: updated));
   }
 }

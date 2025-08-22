@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'bloc_main.dart';
+import 'package:todolist/theme_cubit.dart';
+import 'todo_cubit.dart';
 import 'pages/todo_list_page.dart';
 
 import 'pages/todo_setting_page.dart';
 
 void main() {
-  runApp(BlocProvider(create: (_) => TodoCubit(), child: const TodoApp()));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => TodoCubit()),
+        BlocProvider(create: (_) => ThemeCubit()), // 新增 ThemeCubit
+      ],
+      child: const TodoApp(),
+    ),
+  );
 }
 
 class TodoApp extends StatefulWidget {
@@ -21,14 +30,14 @@ class _TodoAppState extends State<TodoApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TodoCubit, TodoState>(
+    return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Todo List',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
-          themeMode: state.themeMode,
+          themeMode: state.themeMode, // 使用 ThemeCubit 的状态
           home: Scaffold(
             body: IndexedStack(
               index: _currentIndex,

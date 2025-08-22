@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc_main.dart';
+import 'package:todolist/theme_cubit.dart';
+import '../todo_cubit.dart';
+
+import '../utils/random_list.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -8,7 +11,9 @@ class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void addBatch() {
-      context.read<TodoCubit>().addRandomTodos(5);
+      final newTodos = TodoUtils.generateRandomTodos(5);
+      context.read<TodoCubit>().addTodos(newTodos);
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Added 5 random todos!")));
@@ -22,7 +27,7 @@ class SettingPage extends StatelessWidget {
     }
 
     void toggleTheme() {
-      context.read<TodoCubit>().toggleTheme();
+      context.read<ThemeCubit>().toggleTheme();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Theme toggled!")));

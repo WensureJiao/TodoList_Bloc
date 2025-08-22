@@ -65,6 +65,14 @@ class TodoEditPage extends StatelessWidget {
         ).showSnackBar(const SnackBar(content: Text('Title is required')));
         return;
       }
+
+      if (startTime == null || endTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Start and End time are required')),
+        );
+        return;
+      }
+
       final newTodo = Todo(
         id: todo?.id ?? DateTime.now().toIso8601String(),
         title: titleController.text,
@@ -78,6 +86,7 @@ class TodoEditPage extends StatelessWidget {
         endTime: endTime,
         status: status,
       );
+
       onSave(newTodo);
     }
 

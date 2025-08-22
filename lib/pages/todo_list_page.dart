@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc_main.dart';
+import '../todo_cubit.dart';
 import '../models/todo.dart';
 import 'todo_edit_page.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +14,7 @@ class TodoListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        //blockbuilder 监听状态变化
         title: BlocBuilder<TodoCubit, TodoState>(
           builder: (context, state) =>
               Text('TODO List - Sort: ${state.sortType.name}'),
@@ -53,6 +54,7 @@ class TodoListPage extends StatelessWidget {
               final todoId = todos[index].id;
 
               return BlocSelector<TodoCubit, TodoState, Todo?>(
+                //
                 selector: (state) {
                   final list = state.todos
                       .where((t) => t.id == todoId)
